@@ -33,26 +33,6 @@
 
 //L4DBuiltinVoteStyle g_L4DBuiltinVoteStyle;
 
-bool L4DBaseBuiltinVoteStyle::CheckVoteType(BuiltinVoteType type)
-{
-	switch(type)
-	{
-	case BuiltinVoteType_ChgCampaign:
-	case BuiltinVoteType_ReturnToLobby:
-	case BuiltinVoteType_ChgDifficulty:
-	case BuiltinVoteType_Custom_YesNo:
-	case BuiltinVoteType_Kick:
-	case BuiltinVoteType_Restart:
-	case BuiltinVoteType_ChgLevel:
-		return true;
-		break;
-
-	default:
-		return false;
-		break;
-	}
-}
-
 unsigned int L4DBaseBuiltinVoteStyle::GetMaxItems()
 {
 	return 2;
@@ -73,84 +53,6 @@ bool CL4DBaseBuiltinVote::UpdateVoteCounts(unsigned int items, CVector<unsigned 
 	events->FireEvent(changeEvent);
 
 	return true;
-}
-
-const char *CL4DBaseBuiltinVote::GetStartTranslation()
-{
-	const char *translation;
-
-	switch(m_voteType)
-	{
-	case BuiltinVoteType_ChgCampaign:
-		translation = TRANSLATION_L4D_VOTE_CHANGECAMPAIGN_START;
-		break;
-
-	case BuiltinVoteType_ReturnToLobby:
-		translation = TRANSLATION_L4D_VOTE_RETURNTOLOBBY_START;
-		break;
-
-	case BuiltinVoteType_ChgDifficulty:
-		translation = TRANSLATION_L4D_VOTE_CHANGEDIFFICULTY_START;
-		break;
-
-	case BuiltinVoteType_Kick:
-		translation = TRANSLATION_L4D_VOTE_KICK_START;
-		break;
-
-	case BuiltinVoteType_Restart:
-		translation = TRANSLATION_L4D_VOTE_RESTART_START;
-		break;
-
-	case BuiltinVoteType_ChgLevel:
-		translation = TRANSLATION_L4D_VOTE_CHANGELEVEL_START;
-		break;
-
-	default:
-		translation = TRANSLATION_L4D_VOTE_CUSTOM;
-		break;
-
-	}
-
-	return translation;
-}
-
-const char *CL4DBaseBuiltinVote::GetPassTranslation()
-{
-	const char *translation;
-
-	switch(m_voteType)
-	{
-	case BuiltinVoteType_ChgCampaign:
-		translation = TRANSLATION_L4D_VOTE_CHANGECAMPAIGN_PASSED;
-		break;
-
-	case BuiltinVoteType_ReturnToLobby:
-		translation = TRANSLATION_L4D_VOTE_RETURNTOLOBBY_PASSED;
-		break;
-
-	case BuiltinVoteType_ChgDifficulty:
-		translation = TRANSLATION_L4D_VOTE_CHANGEDIFFICULTY_PASSED;
-		break;
-
-	case BuiltinVoteType_Kick:
-		translation = TRANSLATION_L4D_VOTE_KICK_PASSED;
-		break;
-
-	case BuiltinVoteType_Restart:
-		translation = TRANSLATION_L4D_VOTE_RESTART_PASSED;
-		break;
-
-	case BuiltinVoteType_ChgLevel:
-		translation = TRANSLATION_L4D_VOTE_CHANGELEVEL_PASSED;
-		break;
-
-	default:
-		translation = TRANSLATION_L4D_VOTE_CUSTOM;
-		break;
-
-	}
-
-	return translation;
 }
 
 void CL4DBaseBuiltinVote::OnClientCommand(edict_t *pEntity, const CCommand &cmd)

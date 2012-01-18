@@ -142,8 +142,9 @@ public:
 	virtual short GetTeam();
 	virtual void SetInitiator(unsigned char client);
 	virtual unsigned char GetInitiator();
-	virtual void DisplayVotePass(const char* winner) =0;
+	virtual void DisplayVotePass(const char* winner="") =0;
 	virtual void DisplayVoteFail(BuiltinVoteFailReason reason=BuiltinVoteFail_Generic) =0;
+	virtual void DisplayVoteFail(int client, BuiltinVoteFailReason reason=BuiltinVoteFail_Generic) =0;
 	//virtual void DisplayCallVoteFail(int client, BuiltinCallVoteFailReason reason, short param1) =0;
 	virtual void ClientSelectedItem(int client, unsigned int item) =0;
 	virtual IBuiltinVoteHandler *GetHandler();
@@ -156,7 +157,7 @@ protected:
 private:
 	void InternalDelete();
 protected:
-	String m_Title;
+	String m_Argument;
 	IBuiltinVoteStyle *m_pStyle;
 	BaseStringTable m_Strings;
 	CVector<CItem> m_items;

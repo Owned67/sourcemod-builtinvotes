@@ -766,6 +766,28 @@ cell_t DisplayBuiltinVotePass(IPluginContext *pContext, const cell_t *params)
 	return 1;
 }
 
+cell_t DisplayBuiltinVotePass2(IPluginContext *pContext, const cell_t *params)
+{
+	Handle_t hndl = (Handle_t)params[1];
+	HandleError err;
+	IBaseBuiltinVote *vote;
+
+	if ((err=g_BuiltinVotes.ReadVoteHandle(params[1], &vote)) != HandleError_None)
+	{
+		return pContext->ThrowNativeError("Vote handle %x is invalid (error %d)", hndl, err);
+	}
+
+	char *translation;
+	char *winner;
+
+	pContext->LocalToString(params[2], &translation);
+	pContext->LocalToString(params[3], &winner);
+
+	vote->DisplayVotePass(translation, winner);
+
+	return 1;
+}
+
 cell_t DisplayBuiltinVoteFail(IPluginContext *pContext, const cell_t *params)
 {
 	Handle_t hndl = (Handle_t)params[1];

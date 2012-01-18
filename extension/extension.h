@@ -42,12 +42,16 @@
 #include <BuiltinVoteHandler.h>
 #include "igameevents.h"
 #include "natives.h"
+#include "icvar.h"
 
 /**
  * @brief Sample implementation of the SDK Extension.
  * Note: Uncomment one of the pre-defined virtual functions in order to use it.
  */
-class BuiltinVoteManager : public SDKExtension, public IBuiltinVoteManager, public IHandleTypeDispatch
+class BuiltinVoteManager : public SDKExtension,
+	public IBuiltinVoteManager,
+	public IHandleTypeDispatch,
+	public IConCommandBaseAccessor
 {
 	friend class BuiltinVoteHandler;
 	friend class CBaseBuiltinVote;
@@ -133,6 +137,9 @@ public:
 
 #endif
 
+public:  // IConCommandBaseAccessor
+	virtual bool RegisterConCommandBase(ConCommandBase *pVar);
+
 public: //IBuiltinVoteManager
 	virtual const char *GetInterfaceName()
 	{
@@ -174,6 +181,6 @@ extern BuiltinVoteManager g_BuiltinVotes;
 extern CGlobalVars *gpGlobals;
 extern BuiltinVoteHandler s_VoteHandler;
 //extern IBuiltinVoteStyle *m_VoteStyle;
-//extern ICvar *icvar;
+extern ICvar *icvar;
 
 #endif //_INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_

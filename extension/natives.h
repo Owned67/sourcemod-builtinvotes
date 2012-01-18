@@ -117,6 +117,7 @@ cell_t GetBuiltinVoteTeam(IPluginContext *pContext, const cell_t *params);
 cell_t SetBuiltinVoteInitiator(IPluginContext *pContext, const cell_t *params);
 cell_t GetBuiltinVoteInitiator(IPluginContext *pContext, const cell_t *params);
 cell_t DisplayBuiltinVotePass(IPluginContext *pContext, const cell_t *params);
+cell_t DisplayBuiltinVotePass2(IPluginContext *pContext, const cell_t *params);
 cell_t DisplayBuiltinVoteFail(IPluginContext *pContext, const cell_t *params);
 
 const sp_nativeinfo_t g_Natives[] = 
@@ -149,6 +150,7 @@ const sp_nativeinfo_t g_Natives[] =
 	{"SetBuiltinVoteInitiator",			SetBuiltinVoteInitiator},
 	{"GetBuiltinVoteInitiator",			GetBuiltinVoteInitiator},
 	{"DisplayBuiltinVotePass",			DisplayBuiltinVotePass},
+	{"DisplayBuiltinVotePass2",			DisplayBuiltinVotePass2},
 	{"DisplayBuiltinVoteFail",			DisplayBuiltinVoteFail},
 	{NULL,								NULL},
 };

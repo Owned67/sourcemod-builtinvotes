@@ -59,6 +59,12 @@ using namespace SourceMod;
 #define TRANSLATION_L4D_VOTE_CHANGEDIFFICULTY_START		"#L4D_vote_change_difficulty"
 #define TRANSLATION_L4D_VOTE_CHANGEDIFFICULTY_PASSED	"#L4D_vote_passed_change_difficulty"
 
+// User vote to change alltalk.
+#define TRANSLATION_L4D_VOTE_ALLTALK_START				"#L4D_vote_alltalk_change"
+#define TRANSLATION_L4D_VOTE_ALLTALK_PASSED				"#L4D_vote_passed_alltalk_change"
+#define TRANSLATION_L4D_VOTE_ALLTALK_ENABLE				"#L4D_vote_alltalk_enable"
+#define TRANSLATION_L4D_VOTE_ALLTALK_DISABLE			"#L4D_vote_alltalk_disable"
+
 // While not a vote string, it works just as well.
 #define TRANSLATION_L4D_VOTE_CUSTOM						"#L4D_TargetID_Player"
 
@@ -70,7 +76,7 @@ public: // BaseBuiltinVoteStyle
 	//virtual void SendDisplay(int clients[], unsigned int num_clients, IBaseBuiltinVote *vote) =0;
 public: //IBuiltinVoteStyle
 	virtual const char *GetStyleName() =0;
-	bool CheckVoteType(BuiltinVoteType type);
+	virtual bool CheckVoteType(BuiltinVoteType type) =0;
 	virtual IBaseBuiltinVote *CreateVote(IBuiltinVoteHandler *handler, BuiltinVoteType type, IdentityToken_t *pOwner=NULL) =0;
 	unsigned int GetMaxItems();
 	virtual unsigned int GetApproxMemUsage() =0;
@@ -87,13 +93,12 @@ public: //IBaseBuiltinVote
 	virtual bool UpdateVoteCounts(unsigned int items, CVector<unsigned int> votes, unsigned int totalClients);
 public: // CBaseBuiltinVote
 	virtual void Cancel_Finally() =0;
-	virtual void DisplayVotePass(const char* winner) =0;
+	virtual void DisplayVotePass(const char *winner="") =0;
+	virtual void DisplayVotePass(const char *translation, const char *winner="") =0;
 	virtual void DisplayVoteFail(BuiltinVoteFailReason reason=BuiltinVoteFail_Generic) =0;
+	virtual void DisplayVoteFail(int client, BuiltinVoteFailReason reason=BuiltinVoteFail_Generic) =0;
 	//virtual void DisplayCallVoteFail(int client, BuiltinCallVoteFailReason reason, short param1) =0;
 	virtual void ClientSelectedItem(int client, unsigned int item) =0;
-protected:
-	const char *GetStartTranslation();
-	const char *GetPassTranslation();
 };
 
 

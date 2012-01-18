@@ -391,12 +391,12 @@ IBuiltinVoteStyle *CBaseBuiltinVote::GetDrawStyle()
 
 void CBaseBuiltinVote::SetArgument(const char *message)
 {
-	m_Title.assign(message);
+	m_Argument.assign(message);
 }
 
 const char *CBaseBuiltinVote::GetArgument()
 {
-	return m_Title.c_str();
+	return m_Argument.c_str();
 }
 
 void CBaseBuiltinVote::Cancel()
@@ -407,11 +407,13 @@ void CBaseBuiltinVote::Cancel()
 	}
 
 	m_bCancelling = true;
+
 	if (!m_bResultDisplayed)
 	{
 		m_pHandler->OnVoteCancel(this, BuiltinVoteFail_Generic);
 		m_pHandler->OnVoteEnd(this, BuiltinVoteEnd_Cancelled);
 	}
+
 	m_bCancelling = false;
 
 	if (m_bShouldDelete)
@@ -478,7 +480,7 @@ IBuiltinVoteHandler *CBaseBuiltinVote::GetHandler()
 
 unsigned int CBaseBuiltinVote::GetBaseMemUsage()
 {
-	return m_Title.size()
+	return m_Argument.size()
 		+ m_Strings.GetMemTable()->GetMemUsage()
 		+ (m_items.size() * sizeof(CItem));
 }
