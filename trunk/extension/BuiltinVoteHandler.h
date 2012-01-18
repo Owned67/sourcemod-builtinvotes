@@ -47,6 +47,20 @@
 using namespace SourceHook;
 using namespace SourceMod;
 
+class RedrawTimer :
+	public ITimedEvent
+{
+public:
+	RedrawTimer(int client, IBaseBuiltinVote *vote);
+	~RedrawTimer();
+public: //ITimedEvent
+	ResultType OnTimer(ITimer *pTimer, void *pData);
+	void OnTimerEnd(ITimer *pTimer, void *pData);
+private:
+	int m_client;
+	IBaseBuiltinVote *m_pVote;
+};
+
 class BuiltinVoteHandler :
 	public IBuiltinVoteHandler,
 	public IClientListener,
@@ -107,7 +121,7 @@ private:
 	unsigned int m_VoteFlags;
 	float m_fStartTime;
 	unsigned int m_nVoteTime;
-	unsigned int m_ElapsedTime;
+	unsigned int m_TimeLeft;
 	int m_ClientVotes[256+1];
 	bool m_Revoting[256+1];
 	char m_leaderList[1024];

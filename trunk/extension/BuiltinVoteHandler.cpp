@@ -32,9 +32,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include "BuiltinVoteHandler.h"
+#include <ITranslator.h>
 #include <IPlayerHelpers.h>
 #include <icvar.h>
 #include <convar.h>
+
+//#define VOTE_DEBUG
+
+#define VOTE_DELAY_TIME 3
 
 float g_next_vote = 0.0f;
 
@@ -95,10 +100,9 @@ bool Translate(char *buffer,
 	}
 	va_end(ap);
 
-	if (!translator->FormatString(buffer,
+	if (!corePhrases->FormatString(buffer,
 		maxlength, 
 		format,
-		corePhrases,
 		params,
 		numparams,
 		pOutLength,
@@ -106,10 +110,27 @@ bool Translate(char *buffer,
 	{
 		if (fail_phrase != NULL)
 		{
+#ifdef VOTE_DEBUG
+			smutils->LogMessage(myself, "Could not find phrase: %s", fail_phrase);
+#endif
 			smutils->LogError(myself, "Could not find phrase: %s", fail_phrase);
 		}
 		else
 		{
+#ifdef VOTE_DEBUG
+			fail_phrase = (const char*)params[0];
+			int client = *(int *)params[1];
+			if (client > 0)
+			{
+				IGamePlayer *pPlayer = playerhelpers->GetGamePlayer(client);
+				unsigned int language = translator->GetClientLanguage(client);
+				smutils->LogMessage(myself, "Unknown fatal error while translating phrase \"%s\" for client \"%s\" using language %d", fail_phrase, pPlayer->GetName(), language);
+			}
+			else
+			{
+				smutils->LogMessage(myself, "Unknown fatal error while translating phrase \"%s\" for server", fail_phrase);
+			}
+#endif
 			smutils->LogError(myself, "Unknown fatal error while translating a phrase.");
 		}
 
@@ -217,6 +238,7 @@ bool BuiltinVoteHandler::StartVote(IBaseBuiltinVote *vote,
 
 	m_fStartTime = gpGlobals->curtime;
 	m_nVoteTime = max_time;
+	m_TimeLeft = max_time;
 
 	unsigned int clientCount = 0;
 
@@ -273,8 +295,6 @@ bool BuiltinVoteHandler::GetClientVoteChoice(int client, unsigned int *pItem)
 
 bool BuiltinVoteHandler::RedrawToClient(int client, bool revotes)
 {
-	unsigned int time_limit;
-
 	if (!IsClientInVotePool(client))
 	{
 		return false;
@@ -282,34 +302,29 @@ bool BuiltinVoteHandler::RedrawToClient(int client, bool revotes)
 
 	if (m_ClientVotes[client] >= 0)
 	{
-		if ((m_VoteFlags & VOTEFLAG_NO_REVOTES) == VOTEFLAG_NO_REVOTES || !revotes)
+		if ((m_VoteFlags & VOTEFLAG_NO_REVOTES) == VOTEFLAG_NO_REVOTES || !revotes || m_nVoteTime <= VOTE_DELAY_TIME)
 		{
 			return false;
 		}
 		assert((unsigned)m_ClientVotes[client] < m_Items);
 		assert(m_Votes[m_ClientVotes[client]] > 0);
+
+		// Display the fail screen for a second.
+		m_pCurVote->DisplayVoteFail(client, BuiltinVoteFail_Generic);
+
+		m_Clients++;
 		m_Votes[m_ClientVotes[client]]--;
 		m_ClientVotes[client] = VOTE_PENDING;
 		m_Revoting[client] = true;
 		m_NumVotes--;
 	}
 
-	if (m_nVoteTime == VOTE_TIME_FOREVER)
-	{
-		time_limit = m_nVoteTime;
-	}
-	else
-	{
-		time_limit = (int)((float)m_nVoteTime - (gpGlobals->curtime - m_fStartTime));
+	RedrawTimer *timer = new RedrawTimer(client, m_pCurVote);
 
-		/* Make sure this doesn't round to zero */
-		if (time_limit == VOTE_TIME_FOREVER)
-		{
-			time_limit = 1;
-		}
-	}
+	timersys->CreateTimer(timer, VOTE_DELAY_TIME, NULL, TIMER_FLAG_NO_MAPCHANGE);
 
-	return m_pCurVote->Display(client);
+	return true;
+	//return m_pCurVote->Display(client);
 }
 
 bool BuiltinVoteHandler::InitializeVoting(IBaseBuiltinVote *vote,
@@ -548,7 +563,11 @@ void BuiltinVoteHandler::OnVoteSelect(IBaseBuiltinVote *vote, int client, unsign
 				if (sm_vote_console->GetBool())
 				{
 					int target = SOURCEMOD_SERVER_LANGUAGE;
-					Translate(buffer, sizeof(buffer), "[SM] %T", 4, NULL, "Voted For", &target, playerhelpers->GetGamePlayer(client)->GetName(), choice);
+					
+#ifdef VOTE_DEBUG
+					smutils->LogMessage(myself, "Sending vote cast to server console.");
+#endif
+					Translate(buffer, sizeof(buffer), "[BV] %T", 4, NULL, "Voted For", &target, playerhelpers->GetGamePlayer(client)->GetName(), choice);
 					engine->LogPrint(buffer);
 				}
 
@@ -564,20 +583,26 @@ void BuiltinVoteHandler::OnVoteSelect(IBaseBuiltinVote *vote, int client, unsign
 						{
 							if (m_Revoting[client])
 							{
-								Translate(buffer, sizeof(buffer), "[SM] %T", 4, NULL, "Changed Vote", &i, playerhelpers->GetGamePlayer(client)->GetName(), choice);
+								Translate(buffer, sizeof(buffer), "[BV] %T", 4, NULL, "Changed Vote", &i, playerhelpers->GetGamePlayer(client)->GetName(), choice);
 							}
 							else
 							{
-								Translate(buffer, sizeof(buffer), "[SM] %T", 4, NULL, "Voted For", &i, playerhelpers->GetGamePlayer(client)->GetName(), choice);
+								Translate(buffer, sizeof(buffer), "[BV] %T", 4, NULL, "Voted For", &i, playerhelpers->GetGamePlayer(client)->GetName(), choice);
 							}
 
 							if (sm_vote_chat->GetBool())
 							{
+#ifdef VOTE_DEBUG
+								smutils->LogMessage(myself, "Sending vote cast to chat for %s.", pPlayer->GetName());
+#endif
 								gamehelpers->TextMsg(i, TEXTMSG_DEST_CHAT, buffer);
 							}
 
 							if (sm_vote_client_console->GetBool())
 							{
+#ifdef VOTE_DEBUG
+								smutils->LogMessage(myself, "Sending vote cast to client console for %s.", pPlayer->GetName());
+#endif
 								engine->ClientPrintf(pPlayer->GetEdict(), buffer);
 							}
 						}
@@ -648,8 +673,13 @@ void BuiltinVoteHandler::DrawHintProgress()
 	int maxclients = playerhelpers->GetMaxClients();
 	for (int i=1; i<=maxclients; i++)
 	{
-		if (playerhelpers->GetGamePlayer(i)->IsInGame())
+		IGamePlayer *pPlayer = playerhelpers->GetGamePlayer(i);
+		if (pPlayer->IsInGame() && !pPlayer->IsFakeClient())
 		{
+#ifdef VOTE_DEBUG
+			smutils->LogMessage(myself, "Sending vote cast to hintbox for %s.", pPlayer->GetName());
+#endif
+
 			Translate(buffer, sizeof(buffer), "%T%s", 6, NULL, "Vote Count", &i, &m_NumVotes, &m_TotalClients, &iTimeRemaining, &m_leaderList);
 			gamehelpers->HintTextMsg(i, buffer);
 		}
@@ -703,9 +733,7 @@ ResultType BuiltinVoteHandler::OnTimer(ITimer *pTimer, void *pData)
 {
 	DrawHintProgress();
 
-	m_ElapsedTime++;
-
-	if (m_ElapsedTime == m_nVoteTime)
+	if (--m_TimeLeft == 0)
 	{
 		return Pl_Stop;
 	}
@@ -720,5 +748,20 @@ void BuiltinVoteHandler::OnTimerEnd(ITimer *pTimer, void *pData)
 		m_displayTimer = NULL;
 		EndVoting();
 	}
-	m_ElapsedTime = 0;
+}
+
+RedrawTimer::RedrawTimer(int client, IBaseBuiltinVote *vote) :
+m_client(client), m_pVote(vote)
+{
+}
+
+ResultType RedrawTimer::OnTimer(ITimer *pTimer, void *pData)
+{
+	m_pVote->Display(m_client);
+	return Pl_Stop;
+}
+
+void RedrawTimer::OnTimerEnd(ITimer *pTimer, void *pData)
+{
+	// do nothing
 }

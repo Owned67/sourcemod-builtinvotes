@@ -40,6 +40,7 @@ class L4D1BuiltinVoteStyle : public L4DBaseBuiltinVoteStyle
 {
 public: // L4DBaseBuiltinVoteStyle
 	//void SendDisplay(int clients[], unsigned int num_clients, IBaseBuiltinVote *vote) =0;
+	bool CheckVoteType(BuiltinVoteType type);
 	const char *GetStyleName();
 	IBaseBuiltinVote *CreateVote(IBuiltinVoteHandler *handler, BuiltinVoteType type, IdentityToken_t *pOwner=NULL);
 	unsigned int GetApproxMemUsage();
@@ -55,8 +56,10 @@ public: //IBaseBuiltinVote
 	unsigned int GetApproxMemUsage();
 public: // CBaseBuiltinVote
 	void Cancel_Finally();
-	void DisplayVotePass(const char* winner);
+	void DisplayVotePass(const char *winner="");
+	void DisplayVotePass(const char *translation, const char *winner="");
 	void DisplayVoteFail(BuiltinVoteFailReason reason=BuiltinVoteFail_Generic);
+	void DisplayVoteFail(int client, BuiltinVoteFailReason reason=BuiltinVoteFail_Generic);
 	//void DisplayCallVoteFail(int client, BuiltinCallVoteFailReason reason, short param1);
 	void ClientSelectedItem(int client, unsigned int item);
 private:

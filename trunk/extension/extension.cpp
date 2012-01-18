@@ -30,6 +30,8 @@
  */
 
 #include "extension.h"
+#include "compat_wrappers.h"
+
 #if SOURCE_ENGINE == SE_ORANGEBOXVALVE
 #include "BuiltinVoteStyle_TF2.h"
 #elif SOURCE_ENGINE == SE_LEFT4DEAD
@@ -49,10 +51,17 @@ SMEXT_LINK(&g_BuiltinVotes);
 
 BuiltinVoteHandler s_VoteHandler;
 CGlobalVars *gpGlobals;
-IPhraseCollection *corePhrases;
 ICvar *icvar;
+IPhraseCollection *corePhrases;
 IServerGameClients *servergameclients;
 IGameEventManager2 *events;
+
+bool BuiltinVoteManager::RegisterConCommandBase(ConCommandBase *pVar)
+{
+	/* Always call META_REGCVAR instead of going through the engine. */
+	return META_REGCVAR(pVar);
+}
+
 
 bool BuiltinVoteManager::SDK_OnMetamodLoad(ISmmAPI *ismm, char *error, size_t maxlen, bool late)
 {
@@ -61,7 +70,9 @@ bool BuiltinVoteManager::SDK_OnMetamodLoad(ISmmAPI *ismm, char *error, size_t ma
 	GET_V_IFACE_ANY(GetServerFactory, servergameclients, IServerGameClients, INTERFACEVERSION_SERVERGAMECLIENTS);
 
 	gpGlobals = ismm->GetCGlobals();
-
+	g_pCVar = icvar;
+	CONVAR_REGISTER(this);
+	
 	return true;
 }
 

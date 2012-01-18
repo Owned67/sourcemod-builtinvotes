@@ -109,11 +109,15 @@ public: //IBaseBuiltinVote
 	unsigned int GetApproxMemUsage();
 public: //CBaseBuiltinVote
 	void Cancel_Finally();
-	void DisplayVotePass(const char* winner);
+	void DisplayVotePass(const char* winner="");
+	void DisplayVotePass(const char *translation, const char* winner="");
 	void DisplayVoteFail(BuiltinVoteFailReason reason=BuiltinVoteFail_Generic);
+	void DisplayVoteFail(int client, BuiltinVoteFailReason reason=BuiltinVoteFail_Generic);
 	//void DisplayCallVoteFail(int client, BuiltinCallVoteFailReason reason, short param1=0);
 	void ClientSelectedItem(int client, unsigned int item);
 	bool UpdateVoteCounts(unsigned int items, CVector<unsigned int> votes, unsigned int totalClients);
+protected:
+	void InternalDisplayVoteFail(int clients[], unsigned int num_clients, BuiltinVoteFailReason reason);
 private:
 	bool m_bOptionsSent;
 };

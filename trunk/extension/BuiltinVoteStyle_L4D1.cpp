@@ -45,6 +45,26 @@ void L4D1BuiltinVoteStyle::SendDisplay(int clients[], unsigned int num_clients, 
 }
 */
 
+bool L4D1BuiltinVoteStyle::CheckVoteType(BuiltinVoteType type)
+{
+	switch(type)
+	{
+	case BuiltinVoteType_ChgCampaign:
+	case BuiltinVoteType_ReturnToLobby:
+	case BuiltinVoteType_ChgDifficulty:
+	case BuiltinVoteType_Custom_YesNo:
+	case BuiltinVoteType_Kick:
+	case BuiltinVoteType_Restart:
+	case BuiltinVoteType_ChgLevel:
+		return true;
+		break;
+
+	default:
+		return false;
+		break;
+	}
+}
+
 IBaseBuiltinVote *L4D1BuiltinVoteStyle::CreateVote(IBuiltinVoteHandler *handler, BuiltinVoteType type, IdentityToken_t *pOwner)
 {
 	if (CheckVoteType(type))
@@ -87,7 +107,40 @@ bool CL4D1BuiltinVote::Display(int clients[], unsigned int num_clients)
 		return false;
 	}
 
-	const char *translation = GetStartTranslation();
+	const char *translation;
+
+	switch(m_voteType)
+	{
+	case BuiltinVoteType_ChgCampaign:
+		translation = TRANSLATION_L4D_VOTE_CHANGECAMPAIGN_START;
+		break;
+
+	case BuiltinVoteType_ReturnToLobby:
+		translation = TRANSLATION_L4D_VOTE_RETURNTOLOBBY_START;
+		break;
+
+	case BuiltinVoteType_ChgDifficulty:
+		translation = TRANSLATION_L4D_VOTE_CHANGEDIFFICULTY_START;
+		break;
+
+	case BuiltinVoteType_Kick:
+		translation = TRANSLATION_L4D_VOTE_KICK_START;
+		break;
+
+	case BuiltinVoteType_Restart:
+		translation = TRANSLATION_L4D_VOTE_RESTART_START;
+		break;
+
+	case BuiltinVoteType_ChgLevel:
+		translation = TRANSLATION_L4D_VOTE_CHANGELEVEL_START;
+		break;
+
+	default:
+		translation = TRANSLATION_L4D_VOTE_CUSTOM;
+		break;
+
+	}
+
 
 	IGameEvent *startEvent = events->CreateEvent("vote_started");
 	startEvent->SetInt("team", m_team);
@@ -120,11 +173,48 @@ void CL4D1BuiltinVote::VoteEnded()
 
 void CL4D1BuiltinVote::DisplayVotePass(const char *winner)
 {
+	const char *translation;
+
+	switch(m_voteType)
+	{
+	case BuiltinVoteType_ChgCampaign:
+		translation = TRANSLATION_L4D_VOTE_CHANGECAMPAIGN_PASSED;
+		break;
+
+	case BuiltinVoteType_ReturnToLobby:
+		translation = TRANSLATION_L4D_VOTE_RETURNTOLOBBY_PASSED;
+		break;
+
+	case BuiltinVoteType_ChgDifficulty:
+		translation = TRANSLATION_L4D_VOTE_CHANGEDIFFICULTY_PASSED;
+		break;
+
+	case BuiltinVoteType_Kick:
+		translation = TRANSLATION_L4D_VOTE_KICK_PASSED;
+		break;
+
+	case BuiltinVoteType_Restart:
+		translation = TRANSLATION_L4D_VOTE_RESTART_PASSED;
+		break;
+
+	case BuiltinVoteType_ChgLevel:
+		translation = TRANSLATION_L4D_VOTE_CHANGELEVEL_PASSED;
+		break;
+
+	default:
+		translation = TRANSLATION_L4D_VOTE_CUSTOM;
+		break;
+
+	}
+
+	DisplayVotePass(translation, winner);
+}
+
+void CL4D1BuiltinVote::DisplayVotePass(const char *translation, const char* winner)
+{
 	SH_REMOVE_HOOK(IServerGameClients, ClientCommand, servergameclients, SH_MEMBER(this, &CL4D1BuiltinVote::OnClientCommand), false);
 
 	VoteEnded();
-
-	const char *translation = GetPassTranslation();
 
 	IGameEvent *passEvent = events->CreateEvent("vote_passed");
 	passEvent->SetString("details", translation);
@@ -145,6 +235,11 @@ void CL4D1BuiltinVote::DisplayVoteFail(BuiltinVoteFailReason reason)
 
 }
 
+void CL4D1BuiltinVote::DisplayVoteFail(int client, BuiltinVoteFailReason reason)
+{
+	//NoOp on L4D
+	return;
+}
 
 void CL4D1BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 {

@@ -38,6 +38,8 @@ SH_DECL_HOOK2_void(IServerGameClients, ClientCommand, SH_NOATTRIB, 0, edict_t *,
 
 L4D2BuiltinVoteStyle g_L4D2BuiltinVoteStyle;
 
+ConVar *sv_alltalk;
+
 /*
 void L4D2BuiltinVoteStyle::SendDisplay(int clients[], unsigned int num_clients, IBaseBuiltinVote *vote)
 {
@@ -45,10 +47,40 @@ void L4D2BuiltinVoteStyle::SendDisplay(int clients[], unsigned int num_clients, 
 }
 */
 
+L4D2BuiltinVoteStyle::L4D2BuiltinVoteStyle() : L4DBaseBuiltinVoteStyle()
+{
+}
+
+bool L4D2BuiltinVoteStyle::CheckVoteType(BuiltinVoteType type)
+{
+	switch(type)
+	{
+	case BuiltinVoteType_ChgCampaign:
+	case BuiltinVoteType_ReturnToLobby:
+	case BuiltinVoteType_ChgDifficulty:
+	case BuiltinVoteType_Custom_YesNo:
+	case BuiltinVoteType_Kick:
+	case BuiltinVoteType_Restart:
+	case BuiltinVoteType_ChgLevel:
+	case BuiltinVoteType_Alltalk:
+		return true;
+		break;
+
+	default:
+		return false;
+		break;
+	}
+}
+
 IBaseBuiltinVote *L4D2BuiltinVoteStyle::CreateVote(IBuiltinVoteHandler *handler, BuiltinVoteType type, IdentityToken_t *pOwner)
 {
 	if (CheckVoteType(type))
 	{
+		if (sv_alltalk == NULL)
+		{
+			sv_alltalk = icvar->FindVar("sv_alltalk");
+		}
+
 		return new CL4D2BuiltinVote(handler, this, type, pOwner);
 	}
 	else
@@ -70,6 +102,17 @@ unsigned int L4D2BuiltinVoteStyle::GetApproxMemUsage()
 CL4D2BuiltinVote::CL4D2BuiltinVote(IBuiltinVoteHandler *pHandler, IBuiltinVoteStyle *pStyle, BuiltinVoteType type, IdentityToken_t *pOwner) :
 CL4DBaseBuiltinVote(pHandler, pStyle, type, pOwner)
 {
+	if (type == BuiltinVoteType_Alltalk)
+	{
+		if (sv_alltalk->GetBool())
+		{
+			SetArgument(TRANSLATION_L4D_VOTE_ALLTALK_DISABLE);
+		}
+		else
+		{
+			SetArgument(TRANSLATION_L4D_VOTE_ALLTALK_ENABLE);
+		}
+	}
 }
 
 CL4D2BuiltinVote::~CL4D2BuiltinVote()
@@ -87,14 +130,50 @@ bool CL4D2BuiltinVote::Display(int clients[], unsigned int num_clients)
 		return false;
 	}
 
-	const char *translation = GetStartTranslation();
+	const char *translation;
+
+	switch(m_voteType)
+	{
+	case BuiltinVoteType_ChgCampaign:
+		translation = TRANSLATION_L4D_VOTE_CHANGECAMPAIGN_START;
+		break;
+
+	case BuiltinVoteType_ReturnToLobby:
+		translation = TRANSLATION_L4D_VOTE_RETURNTOLOBBY_START;
+		break;
+
+	case BuiltinVoteType_ChgDifficulty:
+		translation = TRANSLATION_L4D_VOTE_CHANGEDIFFICULTY_START;
+		break;
+
+	case BuiltinVoteType_Kick:
+		translation = TRANSLATION_L4D_VOTE_KICK_START;
+		break;
+
+	case BuiltinVoteType_Restart:
+		translation = TRANSLATION_L4D_VOTE_RESTART_START;
+		break;
+
+	case BuiltinVoteType_ChgLevel:
+		translation = TRANSLATION_L4D_VOTE_CHANGELEVEL_START;
+		break;
+
+	case BuiltinVoteType_Alltalk:
+		translation = TRANSLATION_L4D_VOTE_ALLTALK_START;
+		break;
+
+	default:
+		translation = TRANSLATION_L4D_VOTE_CUSTOM;
+		break;
+
+	}
 
 	int msgId = usermsgs->GetMessageIndex("VoteStart");
 	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
 	bf->WriteByte(m_team);
 	bf->WriteByte(m_initiator);
 	bf->WriteString(translation);
-	bf->WriteString(m_Title.c_str());
+	bf->WriteString(m_Argument.c_str());
 	if (m_initiator != SERVER_CLIENT_INDEX)
 	{
 		IGamePlayer *player = playerhelpers->GetGamePlayer(m_initiator);
@@ -126,9 +205,53 @@ void CL4D2BuiltinVote::Cancel_Finally()
 
 void CL4D2BuiltinVote::DisplayVotePass(const char *winner)
 {
-	SH_REMOVE_HOOK(IServerGameClients, ClientCommand, servergameclients, SH_MEMBER(this, &CL4D2BuiltinVote::OnClientCommand), false);
+	const char *translation;
 
-	const char *translation = GetPassTranslation();
+	switch(m_voteType)
+	{
+	case BuiltinVoteType_ChgCampaign:
+		translation = TRANSLATION_L4D_VOTE_CHANGECAMPAIGN_PASSED;
+		break;
+
+	case BuiltinVoteType_ReturnToLobby:
+		translation = TRANSLATION_L4D_VOTE_RETURNTOLOBBY_PASSED;
+		break;
+
+	case BuiltinVoteType_ChgDifficulty:
+		translation = TRANSLATION_L4D_VOTE_CHANGEDIFFICULTY_PASSED;
+		break;
+
+	case BuiltinVoteType_Kick:
+		translation = TRANSLATION_L4D_VOTE_KICK_PASSED;
+		break;
+
+	case BuiltinVoteType_Restart:
+		translation = TRANSLATION_L4D_VOTE_RESTART_PASSED;
+		break;
+
+	case BuiltinVoteType_ChgLevel:
+		translation = TRANSLATION_L4D_VOTE_CHANGELEVEL_PASSED;
+		break;
+
+	case BuiltinVoteType_Alltalk:
+		translation = TRANSLATION_L4D_VOTE_ALLTALK_PASSED;
+		winner = GetArgument();
+		break;
+
+	default:
+		translation = TRANSLATION_L4D_VOTE_CUSTOM;
+		break;
+
+	}
+
+	DisplayVotePass(translation, winner);
+}
+
+void CL4D2BuiltinVote::DisplayVotePass(const char *translation, const char *winner)
+{
+	m_bResultDisplayed = true;
+
+	SH_REMOVE_HOOK(IServerGameClients, ClientCommand, servergameclients, SH_MEMBER(this, &CL4D2BuiltinVote::OnClientCommand), false);
 
 	cell_t clients[256+1];
 	unsigned int playersNum = GetAllPlayers(clients);
@@ -144,14 +267,28 @@ void CL4D2BuiltinVote::DisplayVotePass(const char *winner)
 
 void CL4D2BuiltinVote::DisplayVoteFail(BuiltinVoteFailReason reason)
 {
-	SH_REMOVE_HOOK(IServerGameClients, ClientCommand, servergameclients, SH_MEMBER(this, &CL4D2BuiltinVote::OnClientCommand), false);
-
 	cell_t clients[256+1];
 	unsigned int playersNum = GetAllPlayers(clients);
 
+	InternalDisplayVoteFail(clients, playersNum, reason);
+}
+
+void CL4D2BuiltinVote::DisplayVoteFail(int client, BuiltinVoteFailReason reason)
+{
+	cell_t clients[] = { client };
+
+	InternalDisplayVoteFail(clients, 1, reason);
+}
+
+void CL4D2BuiltinVote::InternalDisplayVoteFail(int clients[], unsigned int num_clients, BuiltinVoteFailReason reason)
+{
+	SH_REMOVE_HOOK(IServerGameClients, ClientCommand, servergameclients, SH_MEMBER(this, &CL4D2BuiltinVote::OnClientCommand), false);
+
+	m_bResultDisplayed = true;
+
 	int msgId = usermsgs->GetMessageIndex("VoteFail");
 
-	bf_write *bf = usermsgs->StartMessage(msgId, clients, playersNum, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
 	bf->WriteByte(m_team);
 	usermsgs->EndMessage();
 }

@@ -152,6 +152,7 @@ bool CTF2BuiltinVote::Display(int clients[], unsigned int num_clients)
 		optionsEvent->SetInt("count", maxCount);
 
 		events->FireEvent(optionsEvent);
+		m_bOptionsSent = true;
 	}
 
 	int msgId = usermsgs->GetMessageIndex("VoteStart");
@@ -227,9 +228,6 @@ bool CTF2BuiltinVote::Display(int clients[], unsigned int num_clients)
 
 void CTF2BuiltinVote::DisplayVotePass(const char* winner)
 {
-	m_bResultDisplayed = true;
-	SH_REMOVE_HOOK(IServerGameClients, ClientCommand, servergameclients, SH_MEMBER(this, &CTF2BuiltinVote::OnClientCommand), false);
-
 	const char *translation;
 
 	switch (m_voteType)
@@ -276,6 +274,15 @@ void CTF2BuiltinVote::DisplayVotePass(const char* winner)
 
 	}
 
+	DisplayVotePass(translation, winner);
+}
+
+
+void CTF2BuiltinVote::DisplayVotePass(const char *translation, const char* winner)
+{
+	m_bResultDisplayed = true;
+	SH_REMOVE_HOOK(IServerGameClients, ClientCommand, servergameclients, SH_MEMBER(this, &CTF2BuiltinVote::OnClientCommand), false);
+
 	// Display the vote pass message
 	cell_t clients[256+1];
 	unsigned int playersNum = GetAllPlayers(clients);
@@ -289,7 +296,6 @@ void CTF2BuiltinVote::DisplayVotePass(const char* winner)
 	usermsgs->EndMessage();
 }
 
-
 void CTF2BuiltinVote::DisplayVoteFail(BuiltinVoteFailReason reason)
 {
 	m_bResultDisplayed = true;
@@ -299,13 +305,25 @@ void CTF2BuiltinVote::DisplayVoteFail(BuiltinVoteFailReason reason)
 	cell_t clients[256+1];
 	unsigned int playersNum = GetAllPlayers(clients);
 
+	InternalDisplayVoteFail(clients, playersNum, reason);
+}
+
+void CTF2BuiltinVote::DisplayVoteFail(int client, BuiltinVoteFailReason reason)
+{
+	// Display the vote fail message
+	cell_t clients[] = { client };
+
+	InternalDisplayVoteFail(clients, 1, reason);
+}
+
+void CTF2BuiltinVote::InternalDisplayVoteFail(int clients[], unsigned int num_clients, BuiltinVoteFailReason reason)
+{
 	int msgId = usermsgs->GetMessageIndex("VoteFailed");
 
-	bf_write *bf = usermsgs->StartMessage(msgId, clients, playersNum, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
 	bf->WriteByte(GetTeam());
 	bf->WriteByte(reason);
 	usermsgs->EndMessage();
-
 }
 
 /*

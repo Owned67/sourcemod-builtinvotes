@@ -44,7 +44,7 @@
 #define BUILTINVOTES_VOTE_NO				0
 #define BUILTINVOTES_VOTE_YES				1
 
-#define MAX_TRANSLATE_PARAMS				32
+//#define MAX_TRANSLATE_PARAMS				32
 
 using namespace SourceHook;
 
@@ -110,6 +110,7 @@ namespace SourceMod
 		BuiltinVoteType_ScrambleNow = 12,		/**< TF2: Yes/No, argument ignored */
 		BuiltinVoteType_ScrambleEnd = 13,		/**< TF2: Yes/No, argument ignored */
 		BuiltinVoteType_Custom_Mult = 14,		/**< TF2: Multiple-choice, argument is vote text. */
+		BuiltinVoteType_Alltalk = 15,			/**< L4D2: Yes/No, argument is ignored and set automagically based on the current sv_alltalk setting */
 	};
 
 	/**
@@ -416,7 +417,14 @@ namespace SourceMod
 		 *
 		 * @param winner		Vote winner.
 		 */
-		virtual void DisplayVotePass(const char* winner) =0;
+		virtual void DisplayVotePass(const char *winner="") =0;
+
+		/**
+		 * @brief Display the vote passed screen.
+		 *
+		 * @param winner		Vote winner.
+		 */
+		virtual void DisplayVotePass(const char *translation, const char* winner) =0;
 
 		/**
 		 * @brief Display the vote failed screen.
@@ -424,6 +432,14 @@ namespace SourceMod
 		 * @param reason		BuiltinVoteFailReason with the correct reason. Only used for OB.
 		 */
 		virtual void DisplayVoteFail(BuiltinVoteFailReason reason=BuiltinVoteFail_Generic) =0;
+
+		/**
+		 * @brief Display the vote failed screen.
+		 *
+		 * @param client		Client to display screen to.
+		 * @param reason		BuiltinVoteFailReason with the correct reason. Only used for OB.
+		 */
+		virtual void DisplayVoteFail(int client, BuiltinVoteFailReason reason=BuiltinVoteFail_Generic) =0;
 
 		/**
 		 * @brief Display the callvote failed screen to a single user.
