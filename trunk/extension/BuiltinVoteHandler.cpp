@@ -763,5 +763,5 @@ ResultType RedrawTimer::OnTimer(ITimer *pTimer, void *pData)
 
 void RedrawTimer::OnTimerEnd(ITimer *pTimer, void *pData)
 {
-	// do nothing
+	delete this;
 }
