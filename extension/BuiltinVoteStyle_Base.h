@@ -81,6 +81,7 @@ class BaseBuiltinVoteStyle :
 {
 public:
 	BaseBuiltinVoteStyle();
+	~BaseBuiltinVoteStyle();
 public: //IBuiltinVoteStyle
 	Handle_t GetHandle();
 public: //IClientListener
