@@ -52,7 +52,7 @@ class RedrawTimer :
 {
 public:
 	RedrawTimer(int client, IBaseBuiltinVote *vote);
-	~RedrawTimer();
+	//~RedrawTimer();
 public: //ITimedEvent
 	ResultType OnTimer(ITimer *pTimer, void *pData);
 	void OnTimerEnd(ITimer *pTimer, void *pData);
