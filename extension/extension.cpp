@@ -130,6 +130,9 @@ void BuiltinVoteManager::SDK_OnUnload()
 	// Shut down all the individual vote handlers
 	g_VoteHelpers.OnUnload();
 
+	// Destroy the phrases collection
+	corePhrases->Destroy();
+
 	handlesys->RemoveType(m_VoteType, myself->GetIdentity());
 }
 
