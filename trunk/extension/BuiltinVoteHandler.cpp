@@ -435,9 +435,11 @@ void BuiltinVoteHandler::EndVoting()
 
 	if (m_displayTimer)
 	{
+		/*
 		ITimer *timer = m_displayTimer;
 		m_displayTimer = NULL;
-		timersys->KillTimer(timer);
+		*/
+		timersys->KillTimer(m_displayTimer);
 	}
 
 	if (m_bCancelled)
@@ -748,6 +750,10 @@ ResultType BuiltinVoteHandler::OnTimer(ITimer *pTimer, void *pData)
 
 void BuiltinVoteHandler::OnTimerEnd(ITimer *pTimer, void *pData)
 {
+	if (m_displayTimer != NULL)
+	{
+		m_displayTimer = NULL;
+	}
 }
 
 RedrawTimer::RedrawTimer(int client, IBaseBuiltinVote *vote) :
