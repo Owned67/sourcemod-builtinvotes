@@ -735,6 +735,11 @@ ResultType BuiltinVoteHandler::OnTimer(ITimer *pTimer, void *pData)
 
 	if (--m_TimeLeft == 0)
 	{
+		if (m_displayTimer != NULL)
+		{
+			m_displayTimer = NULL;
+			EndVoting();
+		}
 		return Pl_Stop;
 	}
 
@@ -743,11 +748,6 @@ ResultType BuiltinVoteHandler::OnTimer(ITimer *pTimer, void *pData)
 
 void BuiltinVoteHandler::OnTimerEnd(ITimer *pTimer, void *pData)
 {
-	if (m_displayTimer != NULL)
-	{
-		m_displayTimer = NULL;
-		EndVoting();
-	}
 }
 
 RedrawTimer::RedrawTimer(int client, IBaseBuiltinVote *vote) :
