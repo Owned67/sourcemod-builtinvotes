@@ -172,6 +172,7 @@ void BuiltinVoteHandler::OnUnload()
 void BuiltinVoteHandler::OnMapStart()
 {
 	g_next_vote = 0.0f;
+	InternalReset();
 }
 
 unsigned int BuiltinVoteHandler::GetBuiltinVoteAPIVersion()
