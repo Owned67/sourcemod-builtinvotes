@@ -172,10 +172,8 @@ void BuiltinVoteHandler::OnUnload()
 void BuiltinVoteHandler::OnMapStart()
 {
 	g_next_vote = 0.0f;
-	if (m_pCurVote != NULL)
-	{
-		m_pCurVote->Cancel();
-	}
+
+	CancelVoting();
 	InternalReset();
 }
 
@@ -204,8 +202,6 @@ void BuiltinVoteHandler::OnClientDisconnected(int client)
 			m_Votes[item]--;
 		}
 		m_ClientVotes[client] = VOTE_NOT_VOTING;
-		// Added in 0.5.4 so that players who leave are properly removed from the voting count
-		DecrementPlayerCount();
 	}
 }
 
