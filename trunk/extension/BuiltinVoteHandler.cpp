@@ -645,6 +645,12 @@ void BuiltinVoteHandler::CancelVoting()
 		return;
 	}
 	m_bCancelled = true;
+
+	if (m_displayTimer)
+	{
+		timersys->KillTimer(m_displayTimer);
+	}
+
 	m_pCurVote->Cancel();
 }
 
