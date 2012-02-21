@@ -773,7 +773,7 @@ m_client(client), m_pVote(vote)
 
 ResultType RedrawTimer::OnTimer(ITimer *pTimer, void *pData)
 {
-	if (!s_VoteHandler.IsCancelling() && !s_VoteHandler.WasCancelled())
+	if (s_VoteHandler.IsVoteInProgress() && !s_VoteHandler.IsCancelling() && !s_VoteHandler.WasCancelled())
 	{
 		m_pVote->Display(m_client);
 	}
