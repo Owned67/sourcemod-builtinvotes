@@ -294,6 +294,8 @@ void CTF2BuiltinVote::DisplayVotePass(const char *translation, const char* winne
 	bf->WriteString(translation);
 	bf->WriteString(winner);
 	usermsgs->EndMessage();
+
+	m_bOptionsSent = false;
 }
 
 void CTF2BuiltinVote::DisplayVoteFail(BuiltinVoteFailReason reason)
@@ -306,6 +308,8 @@ void CTF2BuiltinVote::DisplayVoteFail(BuiltinVoteFailReason reason)
 	unsigned int playersNum = GetAllPlayers(clients);
 
 	InternalDisplayVoteFail(clients, playersNum, reason);
+
+	m_bOptionsSent = false;
 }
 
 void CTF2BuiltinVote::DisplayVoteFail(int client, BuiltinVoteFailReason reason)

@@ -174,7 +174,6 @@ void BuiltinVoteHandler::OnMapStart()
 	g_next_vote = 0.0f;
 
 	CancelVoting();
-	InternalReset();
 }
 
 unsigned int BuiltinVoteHandler::GetBuiltinVoteAPIVersion()
@@ -322,9 +321,9 @@ bool BuiltinVoteHandler::RedrawToClient(int client, bool revotes)
 		m_NumVotes--;
 	}
 
-	RedrawTimer *timer = new RedrawTimer(client, m_pCurVote);
+	RedrawTimer *redrawTimer = new RedrawTimer(client, m_pCurVote);
 
-	timersys->CreateTimer(timer, VOTE_DELAY_TIME, NULL, TIMER_FLAG_NO_MAPCHANGE);
+	timersys->CreateTimer(redrawTimer, VOTE_DELAY_TIME, NULL, TIMER_FLAG_NO_MAPCHANGE);
 
 	return true;
 	//return m_pCurVote->Display(client);
@@ -370,6 +369,7 @@ bool BuiltinVoteHandler::InitializeVoting(IBaseBuiltinVote *vote,
 		}
 	}
 
+	m_bWasCancelled = false;
 	m_pCurVote = vote;
 	m_VoteTime = time;
 	m_VoteFlags = flags;
@@ -438,10 +438,6 @@ void BuiltinVoteHandler::EndVoting()
 
 	if (m_displayTimer)
 	{
-		/*
-		ITimer *timer = m_displayTimer;
-		m_displayTimer = NULL;
-		*/
 		timersys->KillTimer(m_displayTimer);
 	}
 
@@ -634,8 +630,14 @@ void BuiltinVoteHandler::InternalReset()
 	m_bCancelled = false;
 	m_pHandler = NULL;
 	m_leaderList[0] = '\0';
-	m_displayTimer = NULL;
+	
 	m_TotalClients = 0;
+
+	if (m_displayTimer)
+	{
+		timersys->KillTimer(m_displayTimer);
+	}
+	m_displayTimer = NULL;
 }
 
 void BuiltinVoteHandler::CancelVoting()
@@ -645,14 +647,10 @@ void BuiltinVoteHandler::CancelVoting()
 		return;
 	}
 	m_bCancelled = true;
-
-	if (m_displayTimer)
-	{
-		timersys->KillTimer(m_displayTimer);
-		m_displayTimer = NULL;
-	}
+	m_bWasCancelled = true;
 
 	m_pCurVote->Cancel();
+	EndVoting();
 }
 
 IBaseBuiltinVote *BuiltinVoteHandler::GetCurrentVote()
@@ -663,6 +661,11 @@ IBaseBuiltinVote *BuiltinVoteHandler::GetCurrentVote()
 bool BuiltinVoteHandler::IsCancelling()
 {
 	return m_bCancelled;
+}
+
+bool BuiltinVoteHandler::WasCancelled()
+{
+	return m_bWasCancelled;
 }
 
 void BuiltinVoteHandler::DrawHintProgress()
@@ -760,10 +763,7 @@ ResultType BuiltinVoteHandler::OnTimer(ITimer *pTimer, void *pData)
 
 void BuiltinVoteHandler::OnTimerEnd(ITimer *pTimer, void *pData)
 {
-	if (m_displayTimer != NULL)
-	{
-		m_displayTimer = NULL;
-	}
+	m_displayTimer = NULL;
 }
 
 RedrawTimer::RedrawTimer(int client, IBaseBuiltinVote *vote) :
@@ -773,7 +773,10 @@ m_client(client), m_pVote(vote)
 
 ResultType RedrawTimer::OnTimer(ITimer *pTimer, void *pData)
 {
-	m_pVote->Display(m_client);
+	if (!s_VoteHandler.IsCancelling() && !s_VoteHandler.WasCancelled())
+	{
+		m_pVote->Display(m_client);
+	}
 	return Pl_Stop;
 }
 

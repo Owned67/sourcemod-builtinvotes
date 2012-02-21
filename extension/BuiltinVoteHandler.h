@@ -91,6 +91,7 @@ public:
 	void CancelVoting();
 	IBaseBuiltinVote *GetCurrentVote();
 	bool IsCancelling();
+	bool WasCancelled();
 	unsigned int GetRemainingVoteDelay();
 	bool IsClientInVotePool(int client);
 	bool GetClientVoteChoice(int client, unsigned int *pItem);
@@ -116,6 +117,7 @@ private:
 	IBaseBuiltinVote *m_pCurVote;
 	bool m_bStarted;
 	bool m_bCancelled;
+	bool m_bWasCancelled;
 	unsigned int m_NumVotes;
 	unsigned int m_VoteTime;
 	unsigned int m_VoteFlags;
@@ -142,5 +144,6 @@ private:
 extern CGlobalVars *gpGlobals;
 extern ICvar *icvar;
 extern IPhraseCollection *corePhrases;
+extern BuiltinVoteHandler s_VoteHandler;
 
 #endif //_INCLUDE_BUILTINVOTEHANDLER_H
