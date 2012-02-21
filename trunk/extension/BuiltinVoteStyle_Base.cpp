@@ -406,6 +406,9 @@ const char *CBaseBuiltinVote::GetArgument()
 
 void CBaseBuiltinVote::Cancel()
 {
+	// Doesn't really do cancelling.  Use BuiltinVoteHandler's CancelVoting instead, which calls this internally
+	/*
+
 	if (m_bCancelling)
 	{
 		return;
@@ -420,6 +423,8 @@ void CBaseBuiltinVote::Cancel()
 	}
 
 	m_bCancelling = false;
+
+	*/
 
 	if (m_bShouldDelete)
 	{
