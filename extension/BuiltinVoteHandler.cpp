@@ -649,6 +649,7 @@ void BuiltinVoteHandler::CancelVoting()
 	if (m_displayTimer)
 	{
 		timersys->KillTimer(m_displayTimer);
+		m_displayTimer = NULL;
 	}
 
 	m_pCurVote->Cancel();
