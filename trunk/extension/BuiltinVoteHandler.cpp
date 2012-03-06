@@ -37,8 +37,6 @@
 #include <icvar.h>
 #include <convar.h>
 
-//#define VOTE_DEBUG
-
 #define VOTE_DELAY_TIME 3
 
 float g_next_vote = 0.0f;
@@ -110,21 +108,50 @@ bool Translate(char *buffer,
 	{
 		if (fail_phrase != NULL)
 		{
-#ifdef VOTE_DEBUG
+#ifdef _DEBUG
 			smutils->LogMessage(myself, "Could not find phrase: %s", fail_phrase);
 #endif
 			smutils->LogError(myself, "Could not find phrase: %s", fail_phrase);
 		}
 		else
 		{
-#ifdef VOTE_DEBUG
+#ifdef _DEBUG
 			fail_phrase = (const char*)params[0];
 			int client = *(int *)params[1];
 			if (client > 0)
 			{
 				IGamePlayer *pPlayer = playerhelpers->GetGamePlayer(client);
 				unsigned int language = translator->GetClientLanguage(client);
+				Translation pTrans;
+				TransError error = corePhrases->FindTranslation(fail_phrase, language, &pTrans);
+				char *errorString;
+
+				switch(error)
+				{
+				case Trans_Okay:
+					errorString = "No Error";
+					break;
+
+				case Trans_BadLanguage:
+					errorString = "Invalid Language ID";
+					break;
+
+				case Trans_BadPhrase:
+					errorString = "Invalid Phrase";
+					break;
+
+				case Trans_BadPhraseLanguage:
+					errorString = "Phrase not available in language";
+					break;
+
+				case Trans_BadPhraseFile:
+					errorString = "Phrase file was unreadable";
+					break;
+
+				}
+
 				smutils->LogMessage(myself, "Unknown fatal error while translating phrase \"%s\" for client \"%s\" using language %d", fail_phrase, pPlayer->GetName(), language);
+				smutils->LogMessage(myself, "FindTranslation returned: %s.", errorString);
 			}
 			else
 			{
@@ -565,7 +592,7 @@ void BuiltinVoteHandler::OnVoteSelect(IBaseBuiltinVote *vote, int client, unsign
 				{
 					int target = SOURCEMOD_SERVER_LANGUAGE;
 					
-#ifdef VOTE_DEBUG
+#ifdef _DEBUG
 					smutils->LogMessage(myself, "Sending vote cast to server console.");
 #endif
 					Translate(buffer, sizeof(buffer), "[BV] %T", 4, NULL, "Voted For", &target, playerhelpers->GetGamePlayer(client)->GetName(), choice);
@@ -593,7 +620,7 @@ void BuiltinVoteHandler::OnVoteSelect(IBaseBuiltinVote *vote, int client, unsign
 
 							if (sm_vote_chat->GetBool())
 							{
-#ifdef VOTE_DEBUG
+#ifdef _DEBUG
 								smutils->LogMessage(myself, "Sending vote cast to chat for %s.", pPlayer->GetName());
 #endif
 								gamehelpers->TextMsg(i, TEXTMSG_DEST_CHAT, buffer);
@@ -601,7 +628,7 @@ void BuiltinVoteHandler::OnVoteSelect(IBaseBuiltinVote *vote, int client, unsign
 
 							if (sm_vote_client_console->GetBool())
 							{
-#ifdef VOTE_DEBUG
+#ifdef _DEBUG
 								smutils->LogMessage(myself, "Sending vote cast to client console for %s.", pPlayer->GetName());
 #endif
 								engine->ClientPrintf(pPlayer->GetEdict(), buffer);
@@ -691,7 +718,7 @@ void BuiltinVoteHandler::DrawHintProgress()
 		IGamePlayer *pPlayer = playerhelpers->GetGamePlayer(i);
 		if (pPlayer->IsInGame() && !pPlayer->IsFakeClient())
 		{
-#ifdef VOTE_DEBUG
+#ifdef _DEBUG
 			smutils->LogMessage(myself, "Sending vote cast to hintbox for %s.", pPlayer->GetName());
 #endif
 
