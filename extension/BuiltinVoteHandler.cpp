@@ -124,7 +124,7 @@ bool Translate(char *buffer,
 				unsigned int language = translator->GetClientLanguage(client);
 				Translation pTrans;
 				TransError error = corePhrases->FindTranslation(fail_phrase, language, &pTrans);
-				char *errorString;
+				const char *errorString;
 
 				switch(error)
 				{
