@@ -388,6 +388,15 @@ void CTF2BuiltinVote::OnClientCommand(edict_t *pEntity, const CCommand &cmd)
 	if (strcmp(cmdname, "vote") == 0)
 	{
 		const char *option = cmd.Arg(1);
+
+#ifdef _DEBUG
+		if (client > 0)
+		{
+			IGamePlayer *pPlayer = playerhelpers->GetGamePlayer(client);
+			const char *name = pPlayer->GetName();
+			smutils->LogMessage(myself, "%s voted for %s", name, option);
+		}
+#endif
 		if (strlen(option) == 7)
 		{
 			// The seventh character is the actual vote option in TF2 (option1 - option5)
