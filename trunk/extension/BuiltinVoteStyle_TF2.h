@@ -91,10 +91,12 @@ public: //IBuiltinVoteStyle
 	IBaseBuiltinVote *CreateVote(IBuiltinVoteHandler *handler, BuiltinVoteType type, IdentityToken_t *pOwner=NULL);
 	unsigned int GetMaxItems();
 	unsigned int GetApproxMemUsage();
+#if 0
 private:
 	//void HookCreateMessage(edict_t *pEdict, DIALOG_TYPE type, KeyValues *kv, IServerPluginCallbacks *plugin);
 private:
 	bool m_bOptionsSent;
+#endif
 };
 
 class CTF2BuiltinVote : public CBaseBuiltinVote

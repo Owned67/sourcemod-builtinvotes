@@ -396,6 +396,28 @@ bool BuiltinVoteHandler::InitializeVoting(IBaseBuiltinVote *vote,
 		}
 	}
 
+	// Check the vote type and adjust argument if valid
+	BuiltinVoteType voteType = vote->GetVoteType();
+
+	switch (voteType)
+	{
+	case BuiltinVoteType_Kick:
+	case BuiltinVoteType_KickCheating:
+	case BuiltinVoteType_KickIdle:
+	case BuiltinVoteType_KickScamming:
+		int userid = vote->GetTarget();
+		if (userid > 0)
+		{
+			int client = playerhelpers->GetClientOfUserId(userid);
+			IGamePlayer *player = playerhelpers->GetGamePlayer(client);
+			if (player != NULL)
+			{
+				vote->SetArgument(player->GetName());
+			}
+		}
+		break;
+	}
+
 	m_bWasCancelled = false;
 	m_pCurVote = vote;
 	m_VoteTime = time;
