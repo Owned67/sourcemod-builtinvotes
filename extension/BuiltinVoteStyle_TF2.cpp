@@ -38,7 +38,7 @@ SH_DECL_HOOK2_void(IServerGameClients, ClientCommand, SH_NOATTRIB, 0, edict_t *,
 
 TF2BuiltinVoteStyle g_TF2BuiltinVoteStyle;
 
-TF2BuiltinVoteStyle::TF2BuiltinVoteStyle() : m_bOptionsSent(false)
+TF2BuiltinVoteStyle::TF2BuiltinVoteStyle()
 {
 }
 

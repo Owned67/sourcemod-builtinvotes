@@ -303,6 +303,25 @@ namespace SourceMod
 		virtual IBuiltinVoteStyle *GetDrawStyle() =0;
 
 		/**
+		 * @brief Sets the vote's target.
+		 * Works with any vote type
+		 * 
+		 * For Kick votes (all 4 types), it will automatically treat the target as a
+		 * Userid, and if the player is currently on the server, call SetArgument
+		 * with the target's current name
+		 *
+		 * @param userid		Userid of client this vote is targetting.
+		 */
+		virtual void SetTarget(int userid) =0;
+
+		/**
+		 * @brief Returns the vote's display/title message.
+		 *
+		 * @return				Message string.
+		 */
+		virtual int GetTarget() =0;
+
+		/**
 		 * @brief Sets the vote's display title/message.
 		 * Only valid for Custom votes
 		 *
@@ -321,7 +340,6 @@ namespace SourceMod
 		 * @brief Returns the vote's type
 		 */
 		virtual BuiltinVoteType GetVoteType() =0;
-
 		/**
 		 * @brief Set the team for the vote. -1 = all teams
 		 *

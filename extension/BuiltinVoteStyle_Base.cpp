@@ -547,3 +547,13 @@ bool CBaseBuiltinVote::Display(int client)
 
 	return Display(clients, 1);
 }
+
+void CBaseBuiltinVote::SetTarget(int userid)
+{
+	m_target = userid;
+}
+
+int CBaseBuiltinVote::GetTarget()
+{
+	return m_target;
+}
