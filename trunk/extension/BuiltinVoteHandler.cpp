@@ -448,6 +448,26 @@ void BuiltinVoteHandler::StartVoting()
 		EndVoting();
 	}
 
+	/* In Source games, the person who started a vote for something automatically votes yes.
+	 */
+	unsigned char initiator = m_pCurVote->GetInitiator();
+	IGamePlayer *player = playerhelpers->GetGamePlayer(initiator);
+	if (player != NULL)
+	{
+		switch(m_pCurVote->GetVoteType())
+		{
+			case BuiltinVoteType_Custom_Mult:
+			case BuiltinVoteType_NextLevelMult:
+			case BuiltinVoteType_Custom_YesNo:
+				break;
+
+			default:
+				OnVoteSelect(m_pCurVote, initiator, BUILTINVOTES_VOTE_YES);
+				break;
+
+		}
+	}		
+
 	m_TotalClients = m_Clients;
 }
 
