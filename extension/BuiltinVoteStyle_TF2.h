@@ -44,9 +44,11 @@ using namespace SourceMod;
 #define TF2_EXTEND										"Extend current Map"
 #define TF2_DISABLED									"(Disabled on Server)"
 
+#if 0
 // These are swapped from the order they appear in L4D/L4D2
 #define TF2_VOTE_YES_INDEX								0
 #define TF2_VOTE_NO_INDEX								1
+#endif
 
 // User vote to kick user.
 #define TRANSLATION_TF2_VOTE_KICK_IDLE_START			"#TF_vote_kick_player_idle"

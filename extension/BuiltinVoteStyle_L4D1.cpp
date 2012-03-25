@@ -245,17 +245,17 @@ void CL4D1BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 {
 	//CBaseBuiltinVote::ClientSelectedItem(client, item);
 
-	if (item <= BUILTINVOTES_VOTE_YES)
+	if (item <= BUILTINVOTES_VOTE_NO)
 	{
 		IGameEvent *castEvent;
 		switch (item)
 		{
-		case BUILTINVOTES_VOTE_NO:
-			castEvent = events->CreateEvent("vote_cast_no");
-			break;
-
 		case BUILTINVOTES_VOTE_YES:
 			castEvent = events->CreateEvent("vote_cast_yes");
+			break;
+
+		case BUILTINVOTES_VOTE_NO:
+			castEvent = events->CreateEvent("vote_cast_no");
 			break;
 
 		}

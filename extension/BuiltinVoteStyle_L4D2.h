@@ -34,6 +34,10 @@
 
 #include "BuiltinVoteStyle_L4D_Base.h"
 
+// These are swapped from the order they appear in L4D/L4D2
+#define L4D2_VOTE_YES_INDEX								1
+#define L4D2_VOTE_NO_INDEX								0
+
 class CL4D2BuiltinVote;
 
 class L4D2BuiltinVoteStyle : public L4DBaseBuiltinVoteStyle
