@@ -347,6 +347,8 @@ void CTF2BuiltinVote::DisplayCallVoteFail(int client, BuiltinCallVoteFailReason 
 
 void CTF2BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 {
+
+#if 0
 	if (m_voteType != BuiltinVoteType_Custom_Mult && m_voteType != BuiltinVoteType_NextLevelMult)
 	{
 		if (item == BUILTINVOTES_VOTE_NO)
@@ -358,6 +360,7 @@ void CTF2BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 			item = TF2_VOTE_YES_INDEX;
 		}
 	}
+#endif
 
 	//Fire the vote_cast event
 	IGameEvent *castEvent = events->CreateEvent("vote_cast");
@@ -405,6 +408,7 @@ void CTF2BuiltinVote::OnClientCommand(edict_t *pEntity, const CCommand &cmd)
 
 			int item = arg - 1;
 
+#if 0
 			// Swap Yes and No votes to match expectations
 			if (m_voteType != BuiltinVoteType_Custom_Mult && m_voteType != BuiltinVoteType_NextLevelMult)
 			{
@@ -417,7 +421,7 @@ void CTF2BuiltinVote::OnClientCommand(edict_t *pEntity, const CCommand &cmd)
 					item = BUILTINVOTES_VOTE_NO;
 				}
 			}
-
+#endif
 			s_VoteHandler.OnVoteSelect(this, client, item);
 
 			RETURN_META(MRES_SUPERCEDE);

@@ -41,8 +41,8 @@
 
 #define SERVER_CLIENT_INDEX 99 // Defined by TF2, may be same in L4D/L4D2
 
-#define BUILTINVOTES_VOTE_NO				0
-#define BUILTINVOTES_VOTE_YES				1
+#define BUILTINVOTES_VOTE_YES				0
+#define BUILTINVOTES_VOTE_NO				1
 
 //#define MAX_TRANSLATE_PARAMS				32
 
