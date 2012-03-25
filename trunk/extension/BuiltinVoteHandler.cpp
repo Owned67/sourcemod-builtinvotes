@@ -452,12 +452,31 @@ void BuiltinVoteHandler::StartVoting()
 	 */
 	unsigned char initiator = m_pCurVote->GetInitiator();
 	IGamePlayer *player = playerhelpers->GetGamePlayer(initiator);
+	int userid;
 	if (player != NULL)
 	{
 		switch(m_pCurVote->GetVoteType())
 		{
 			case BuiltinVoteType_Custom_Mult:
 			case BuiltinVoteType_NextLevelMult:
+				break;
+
+			case BuiltinVoteType_Kick:
+			case BuiltinVoteType_KickCheating:
+			case BuiltinVoteType_KickIdle:
+			case BuiltinVoteType_KickScamming:
+				OnVoteSelect(m_pCurVote, initiator, BUILTINVOTES_VOTE_YES);
+				userid = m_pCurVote->GetTarget();
+				if (userid > 0)
+				{
+					int client = playerhelpers->GetClientOfUserId(userid);
+					IGamePlayer *player = playerhelpers->GetGamePlayer(client);
+					if (player != NULL && IsClientInVotePool(client))
+					{
+						OnVoteSelect(m_pCurVote, client, BUILTINVOTES_VOTE_NO);
+					}
+				}
+
 				break;
 
 			default:
