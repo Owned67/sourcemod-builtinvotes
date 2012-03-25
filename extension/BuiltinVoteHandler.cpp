@@ -458,7 +458,6 @@ void BuiltinVoteHandler::StartVoting()
 		{
 			case BuiltinVoteType_Custom_Mult:
 			case BuiltinVoteType_NextLevelMult:
-			case BuiltinVoteType_Custom_YesNo:
 				break;
 
 			default:
