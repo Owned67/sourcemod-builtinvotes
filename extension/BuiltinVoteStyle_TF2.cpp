@@ -380,7 +380,22 @@ unsigned int CTF2BuiltinVote::GetApproxMemUsage()
 
 bool CTF2BuiltinVote::UpdateVoteCounts(unsigned int items, CVector<unsigned int> votes, unsigned int totalClients)
 {
-	return false;
+	IGameEvent *changeEvent = events->CreateEvent("vote_changed");
+
+	const char *prefix = "option";
+
+	unsigned int maxCount = GetItemCount();
+	for (unsigned int i=0; i < maxCount; i++)
+	{
+		char option[7+1];
+		// I hate string concatenation in C/C++
+		snprintf(option, sizeof(option), "%s%d", prefix, i+1);
+		changeEvent->SetInt(option, votes[i]);
+	}
+	changeEvent->SetInt("potentialVotes", totalClients);
+	events->FireEvent(changeEvent);
+
+	return true;
 }
 
 void CTF2BuiltinVote::OnClientCommand(edict_t *pEntity, const CCommand &cmd)
