@@ -9,29 +9,44 @@ new Handle:g_Vote = INVALID_HANDLE;
 
 public Plugin:myinfo = 
 {
-	name = "BuiltinVotes Test Vote",
+	name = "BuiltinVotes Test Kick Vote",
 	author = "Powerlord",
-	description = "Test Yes/No vote for BuiltinVotes. Works will all game types.",
+	description = "Test Kick vote for BuiltinVotes. Works will all game types.",
 	version = VERSION,
 	url = "https://forums.alliedmods.net/showthread.php?t=162164"
 }
 
 public OnPluginStart()
 {
-	RegAdminCmd("testvote", HandleTestVote, ADMFLAG_VOTE, "Start a test vote.");
+	RegAdminCmd("testkickvote", HandleTestVote, ADMFLAG_VOTE, "Start a test vote.");
 }
 
 public Action:HandleTestVote(client, args)
 {
 	if (IsNewBuiltinVoteAllowed())
 	{
-		g_Vote = CreateBuiltinVote(HandleVote, BuiltinVoteType_Custom_YesNo, BuiltinVoteAction_Cancel | BuiltinVoteAction_VoteEnd | BuiltinVoteAction_End);
+		new target = 0;
+		g_Vote = CreateBuiltinVote(HandleVote, BuiltinVoteType_Kick, BuiltinVoteAction_Cancel | BuiltinVoteAction_VoteEnd | BuiltinVoteAction_End);
+		for (new i = 1; i <= MaxClients; i++)
+		{
+			if (i != client)
+			{
+				target = i;
+				break;
+			}
+		}
+			
 		if (client > 0)
 		{
 			SetBuiltinVoteInitiator(g_Vote, client);
 		}
-		SetBuiltinVoteArgument(g_Vote, "Did this vote work?");
-		DisplayBuiltinVoteToAll(g_Vote, 20);
+		if (target > 0)
+		{
+			SetBuiltinVoteTarget(g_Vote, GetClientUserId(target));
+		}
+		//SetBuiltinVoteArgument(g_Vote, "Did this vote work?");
+		DisplayBuiltinVoteToTeam(g_Vote, GetClientTeam(client), 20);
+		//DisplayBuiltinVoteToAll(g_Vote, 20);
 	}
 	else
 	{
@@ -60,7 +75,12 @@ public HandleVote(Handle:vote, BuiltinVoteAction:action, param1, param2)
 		{
 			if (param1 == BUILTINVOTES_VOTE_YES)
 			{
-				DisplayBuiltinVotePass(vote, "Custom Vote Worked and Passed.");
+				new target = GetBuiltinVoteTarget(vote);
+				new targetId = GetClientOfUserId(target);
+				decl String:name[MAX_NAME_LENGTH];
+				GetClientName(targetId, name, MAX_NAME_LENGTH);
+				
+				DisplayBuiltinVotePass(vote, name);
 			}
 			else if (param1 == BUILTINVOTES_VOTE_NO)
 			{

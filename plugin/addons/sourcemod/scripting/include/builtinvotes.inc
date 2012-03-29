@@ -99,8 +99,8 @@ enum BuiltinVoteAction
 
 #define BUITLINVOTEFLAG_NO_REVOTES		(1<<0)	/**< Players cannot change their votes.  Revotes are not currently supported, so this flag has no effect. */
 
-#define BUILTINVOTES_VOTE_NO			0		/**< Vote was no */
-#define BUILTINVOTES_VOTE_YES			1		/**< Vote was yes */
+#define BUILTINVOTES_VOTE_NO			1		/**< Vote was no */
+#define BUILTINVOTES_VOTE_YES			0		/**< Vote was yes */
 
 // User vote to kick user.
 #define TRANSLATION_L4D_VOTE_KICK_START					"#L4D_vote_kick_player"
@@ -485,6 +485,22 @@ native SetBuiltinVoteInitiator(Handle:vote, client);
  * @error					Invalid Handle
  */
 native GetBuiltinVoteInitiator(Handle:vote);
+
+/**
+ * Set the target userid of the vote.  For kick votes, this also sets the argument
+ * 
+ * @noreturn
+ * @error					Invalid Handle
+ */
+native SetBuiltinVoteTarget(Handle:vote, client);
+
+/**
+ * Retrieve the target userid of the vote
+ * 
+ * @return					Client userid
+ * @error					Invalid Handle
+ */
+native GetBuiltinVoteTarget(Handle:vote);
 
 /**
  * Display vote passed screen
