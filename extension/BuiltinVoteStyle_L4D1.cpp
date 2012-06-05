@@ -266,4 +266,3 @@ void CL4D1BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 
 	}
 }
-
