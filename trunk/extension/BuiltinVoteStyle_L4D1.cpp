@@ -260,9 +260,12 @@ void CL4D1BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 
 		}
 
-		castEvent->SetInt("team", m_team);
-		castEvent->SetInt("entityid", m_initiator);
-		events->FireEvent(castEvent);
+		if (caseEvent != null)
+		{
+			castEvent->SetInt("team", m_team);
+			castEvent->SetInt("entityid", m_initiator);
+			events->FireEvent(castEvent);
+		}
 
 	}
 }
