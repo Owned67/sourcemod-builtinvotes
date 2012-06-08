@@ -211,6 +211,14 @@ bool CTF2BuiltinVote::Display(int clients[], unsigned int num_clients)
 
 	}
 
+	IGameEvent *startEvent = events->CreateEvent("vote_started");
+	startEvent->SetInt("team", m_team);
+	startEvent->SetInt("initiator", m_initiator);
+	startEvent->SetString("issue", translation);
+	startEvent->SetString("param1", GetArgument());
+
+	events->FireEvent(startEvent);
+
 	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
 	bf->WriteByte(GetTeam()); // Automagically converted to -1 here.  Or at least it'd better be.
 	bf->WriteByte(GetInitiator());
@@ -287,6 +295,13 @@ void CTF2BuiltinVote::DisplayVotePass(const char *translation, const char* winne
 	cell_t clients[256+1];
 	unsigned int playersNum = GetAllPlayers(clients);
 
+	// Unknown if this is used, but the event exists
+	IGameEvent *passEvent = events->CreateEvent("vote_passed");
+	passEvent->SetString("details", translation);
+	passEvent->SetString("param1", winner);
+	passEvent->SetInt("team", m_team);
+	events->FireEvent(passEvent);
+
 	int msgId = usermsgs->GetMessageIndex("VotePass");
 
 	bf_write *bf = usermsgs->StartMessage(msgId, clients, playersNum, USERMSG_RELIABLE);
@@ -322,6 +337,11 @@ void CTF2BuiltinVote::DisplayVoteFail(int client, BuiltinVoteFailReason reason)
 
 void CTF2BuiltinVote::InternalDisplayVoteFail(int clients[], unsigned int num_clients, BuiltinVoteFailReason reason)
 {
+
+	IGameEvent *failEvent = events->CreateEvent("vote_failed");
+	failEvent->SetInt("team", GetTeam());
+	events->FireEvent(failEvent);
+
 	int msgId = usermsgs->GetMessageIndex("VoteFailed");
 
 	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
