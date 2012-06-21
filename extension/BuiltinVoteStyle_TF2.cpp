@@ -402,12 +402,12 @@ bool CTF2BuiltinVote::UpdateVoteCounts(unsigned int items, CVector<unsigned int>
 {
 	IGameEvent *changeEvent = events->CreateEvent("vote_changed");
 
-	const char *prefix = "option";
+	const char *prefix = "vote_option";
 
 	unsigned int maxCount = GetItemCount();
 	for (unsigned int i=0; i < maxCount; i++)
 	{
-		char option[7+1];
+		char option[13];
 		// I hate string concatenation in C/C++
 		snprintf(option, sizeof(option), "%s%d", prefix, i+1);
 		changeEvent->SetInt(option, votes[i]);
