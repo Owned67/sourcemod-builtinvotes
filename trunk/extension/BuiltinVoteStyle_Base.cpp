@@ -269,17 +269,17 @@ m_bWillFreeHandle(false), m_hHandle(BAD_HANDLE), m_pHandler(pHandler), m_voteTyp
 {
 	if (type != BuiltinVoteType_Custom_Mult && type != BuiltinVoteType_NextLevelMult)
 	{
-		CItem yesItem;
-		
-		yesItem.infoString = m_Strings.AddString("Yes");
-		yesItem.displayString = m_Strings.AddString("Yes");
-		m_items.push_back(yesItem);
-
 		CItem noItem;
 
 		noItem.infoString = m_Strings.AddString("No");
 		noItem.displayString = m_Strings.AddString("No");
 		m_items.push_back(noItem);
+
+		CItem yesItem;
+		
+		yesItem.infoString = m_Strings.AddString("Yes");
+		yesItem.displayString = m_Strings.AddString("Yes");
+		m_items.push_back(yesItem);
 	}
 }
 
@@ -546,14 +546,4 @@ bool CBaseBuiltinVote::Display(int client)
 	int clients[1] = { client };
 
 	return Display(clients, 1);
-}
-
-void CBaseBuiltinVote::SetTarget(int userid)
-{
-	m_target = userid;
-}
-
-int CBaseBuiltinVote::GetTarget()
-{
-	return m_target;
 }

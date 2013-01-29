@@ -44,11 +44,9 @@ using namespace SourceMod;
 #define TF2_EXTEND										"Extend current Map"
 #define TF2_DISABLED									"(Disabled on Server)"
 
-#if 0
 // These are swapped from the order they appear in L4D/L4D2
 #define TF2_VOTE_YES_INDEX								0
 #define TF2_VOTE_NO_INDEX								1
-#endif
 
 // User vote to kick user.
 #define TRANSLATION_TF2_VOTE_KICK_IDLE_START			"#TF_vote_kick_player_idle"
@@ -93,12 +91,10 @@ public: //IBuiltinVoteStyle
 	IBaseBuiltinVote *CreateVote(IBuiltinVoteHandler *handler, BuiltinVoteType type, IdentityToken_t *pOwner=NULL);
 	unsigned int GetMaxItems();
 	unsigned int GetApproxMemUsage();
-#if 0
 private:
 	//void HookCreateMessage(edict_t *pEdict, DIALOG_TYPE type, KeyValues *kv, IServerPluginCallbacks *plugin);
 private:
 	bool m_bOptionsSent;
-#endif
 };
 
 class CTF2BuiltinVote : public CBaseBuiltinVote

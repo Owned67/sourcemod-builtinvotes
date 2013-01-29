@@ -301,15 +301,6 @@ void CL4D2BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 
 	const cell_t players[] = { client };
 
-	if (item == BUILTINVOTES_VOTE_NO)
-	{
-		item = L4D2_VOTE_NO_INDEX;
-	}
-	else
-	{
-		item = L4D2_VOTE_YES_INDEX;
-	}
-
 	bf_write *bf = usermsgs->StartMessage(msgId, players, 1, USERMSG_RELIABLE);
 	bf->WriteByte(item);
 	usermsgs->EndMessage();

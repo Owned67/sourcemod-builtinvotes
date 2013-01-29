@@ -41,8 +41,8 @@
 
 #define SERVER_CLIENT_INDEX 99 // Defined by TF2, may be same in L4D/L4D2
 
-#define BUILTINVOTES_VOTE_YES				0
-#define BUILTINVOTES_VOTE_NO				1
+#define BUILTINVOTES_VOTE_NO				0
+#define BUILTINVOTES_VOTE_YES				1
 
 //#define MAX_TRANSLATE_PARAMS				32
 
@@ -303,25 +303,6 @@ namespace SourceMod
 		virtual IBuiltinVoteStyle *GetDrawStyle() =0;
 
 		/**
-		 * @brief Sets the vote's target.
-		 * Works with any vote type
-		 * 
-		 * For Kick votes (all 4 types), it will automatically treat the target as a
-		 * Userid, and if the player is currently on the server, call SetArgument
-		 * with the target's current name
-		 *
-		 * @param userid		Userid of client this vote is targetting.
-		 */
-		virtual void SetTarget(int userid) =0;
-
-		/**
-		 * @brief Returns the vote's display/title message.
-		 *
-		 * @return				Message string.
-		 */
-		virtual int GetTarget() =0;
-
-		/**
 		 * @brief Sets the vote's display title/message.
 		 * Only valid for Custom votes
 		 *
@@ -340,6 +321,7 @@ namespace SourceMod
 		 * @brief Returns the vote's type
 		 */
 		virtual BuiltinVoteType GetVoteType() =0;
+
 		/**
 		 * @brief Set the team for the vote. -1 = all teams
 		 *

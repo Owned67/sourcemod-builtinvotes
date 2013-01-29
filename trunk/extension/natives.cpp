@@ -746,35 +746,6 @@ cell_t GetBuiltinVoteInitiator(IPluginContext *pContext, const cell_t *params)
 	return vote->GetInitiator();
 }
 
-cell_t SetBuiltinVoteTarget(IPluginContext *pContext, const cell_t *params)
-{
-	Handle_t hndl = (Handle_t)params[1];
-	HandleError err;
-	IBaseBuiltinVote *vote;
-
-	if ((err=g_BuiltinVotes.ReadVoteHandle(params[1], &vote)) != HandleError_None)
-	{
-		return pContext->ThrowNativeError("Vote handle %x is invalid (error %d)", hndl, err);
-	}
-
-	vote->SetTarget(params[2]);
-	return 1;
-}
-
-cell_t GetBuiltinVoteTarget(IPluginContext *pContext, const cell_t *params)
-{
-	Handle_t hndl = (Handle_t)params[1];
-	HandleError err;
-	IBaseBuiltinVote *vote;
-
-	if ((err=g_BuiltinVotes.ReadVoteHandle(params[1], &vote)) != HandleError_None)
-	{
-		return pContext->ThrowNativeError("Vote handle %x is invalid (error %d)", hndl, err);
-	}
-
-	return vote->GetTarget();
-}
-
 cell_t DisplayBuiltinVotePass(IPluginContext *pContext, const cell_t *params)
 {
 	Handle_t hndl = (Handle_t)params[1];
