@@ -169,7 +169,7 @@ bool CL4D2BuiltinVote::Display(int clients[], unsigned int num_clients)
 	}
 
 	int msgId = usermsgs->GetMessageIndex("VoteStart");
-	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartBitBufMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
 	bf->WriteByte(m_team);
 	bf->WriteByte(m_initiator);
 	bf->WriteString(translation);
@@ -258,7 +258,7 @@ void CL4D2BuiltinVote::DisplayVotePass(const char *translation, const char *winn
 
 	int msgId = usermsgs->GetMessageIndex("VotePass");
 
-	bf_write *bf = usermsgs->StartMessage(msgId, clients, playersNum, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartBitBufMessage(msgId, clients, playersNum, USERMSG_RELIABLE);
 	bf->WriteByte(m_team);
 	bf->WriteString(translation);
 	bf->WriteString(winner);
@@ -288,7 +288,7 @@ void CL4D2BuiltinVote::InternalDisplayVoteFail(int clients[], unsigned int num_c
 
 	int msgId = usermsgs->GetMessageIndex("VoteFail");
 
-	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartBitBufMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
 	bf->WriteByte(m_team);
 	usermsgs->EndMessage();
 }
@@ -301,7 +301,7 @@ void CL4D2BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 
 	const cell_t players[] = { client };
 
-	bf_write *bf = usermsgs->StartMessage(msgId, players, 1, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartBitBufMessage(msgId, players, 1, USERMSG_RELIABLE);
 	bf->WriteByte(item);
 	usermsgs->EndMessage();
 }

@@ -211,7 +211,7 @@ bool CTF2BuiltinVote::Display(int clients[], unsigned int num_clients)
 
 	}
 
-	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartBitBufMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
 	bf->WriteByte(GetTeam()); // Automagically converted to -1 here.  Or at least it'd better be.
 	bf->WriteByte(GetInitiator());
 	bf->WriteString(translation);
@@ -289,7 +289,7 @@ void CTF2BuiltinVote::DisplayVotePass(const char *translation, const char* winne
 
 	int msgId = usermsgs->GetMessageIndex("VotePass");
 
-	bf_write *bf = usermsgs->StartMessage(msgId, clients, playersNum, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartBitBufMessage(msgId, clients, playersNum, USERMSG_RELIABLE);
 	bf->WriteByte(GetTeam());
 	bf->WriteString(translation);
 	bf->WriteString(winner);
@@ -324,7 +324,7 @@ void CTF2BuiltinVote::InternalDisplayVoteFail(int clients[], unsigned int num_cl
 {
 	int msgId = usermsgs->GetMessageIndex("VoteFailed");
 
-	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartBitBufMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
 	bf->WriteByte(GetTeam());
 	bf->WriteByte(reason);
 	usermsgs->EndMessage();
@@ -338,7 +338,7 @@ void CTF2BuiltinVote::DisplayCallVoteFail(int client, BuiltinCallVoteFailReason 
 
 	int msgId = usermsgs->GetMessageIndex("CallVoteFailed");
 
-	bf_write *bf = usermsgs->StartMessage(msgId, clients, 1, USERMSG_RELIABLE);
+	bf_write *bf = usermsgs->StartBitBufMessage(msgId, clients, 1, USERMSG_RELIABLE);
 	bf->WriteByte(reason);
 	bf->WriteShort(param1);
 	usermsgs->EndMessage();
