@@ -38,7 +38,7 @@ SH_DECL_HOOK2_void(IServerGameClients, ClientCommand, SH_NOATTRIB, 0, edict_t *,
 
 TF2BuiltinVoteStyle g_TF2BuiltinVoteStyle;
 
-TF2BuiltinVoteStyle::TF2BuiltinVoteStyle()
+TF2BuiltinVoteStyle::TF2BuiltinVoteStyle() : m_bOptionsSent(false)
 {
 }
 
@@ -211,14 +211,6 @@ bool CTF2BuiltinVote::Display(int clients[], unsigned int num_clients)
 
 	}
 
-	IGameEvent *startEvent = events->CreateEvent("vote_started");
-	startEvent->SetInt("team", m_team);
-	startEvent->SetInt("initiator", m_initiator);
-	startEvent->SetString("issue", translation);
-	startEvent->SetString("param1", GetArgument());
-
-	events->FireEvent(startEvent);
-
 	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
 	bf->WriteByte(GetTeam()); // Automagically converted to -1 here.  Or at least it'd better be.
 	bf->WriteByte(GetInitiator());
@@ -295,13 +287,6 @@ void CTF2BuiltinVote::DisplayVotePass(const char *translation, const char* winne
 	cell_t clients[256+1];
 	unsigned int playersNum = GetAllPlayers(clients);
 
-	// Unknown if this is used, but the event exists
-	IGameEvent *passEvent = events->CreateEvent("vote_passed");
-	passEvent->SetString("details", translation);
-	passEvent->SetString("param1", winner);
-	passEvent->SetInt("team", m_team);
-	events->FireEvent(passEvent);
-
 	int msgId = usermsgs->GetMessageIndex("VotePass");
 
 	bf_write *bf = usermsgs->StartMessage(msgId, clients, playersNum, USERMSG_RELIABLE);
@@ -337,11 +322,6 @@ void CTF2BuiltinVote::DisplayVoteFail(int client, BuiltinVoteFailReason reason)
 
 void CTF2BuiltinVote::InternalDisplayVoteFail(int clients[], unsigned int num_clients, BuiltinVoteFailReason reason)
 {
-
-	IGameEvent *failEvent = events->CreateEvent("vote_failed");
-	failEvent->SetInt("team", GetTeam());
-	events->FireEvent(failEvent);
-
 	int msgId = usermsgs->GetMessageIndex("VoteFailed");
 
 	bf_write *bf = usermsgs->StartMessage(msgId, clients, num_clients, USERMSG_RELIABLE);
@@ -367,8 +347,6 @@ void CTF2BuiltinVote::DisplayCallVoteFail(int client, BuiltinCallVoteFailReason 
 
 void CTF2BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 {
-
-#if 0
 	if (m_voteType != BuiltinVoteType_Custom_Mult && m_voteType != BuiltinVoteType_NextLevelMult)
 	{
 		if (item == BUILTINVOTES_VOTE_NO)
@@ -380,7 +358,6 @@ void CTF2BuiltinVote::ClientSelectedItem(int client, unsigned int item)
 			item = TF2_VOTE_YES_INDEX;
 		}
 	}
-#endif
 
 	//Fire the vote_cast event
 	IGameEvent *castEvent = events->CreateEvent("vote_cast");
@@ -400,22 +377,7 @@ unsigned int CTF2BuiltinVote::GetApproxMemUsage()
 
 bool CTF2BuiltinVote::UpdateVoteCounts(unsigned int items, CVector<unsigned int> votes, unsigned int totalClients)
 {
-	IGameEvent *changeEvent = events->CreateEvent("vote_changed");
-
-	const char *prefix = "vote_option";
-
-	unsigned int maxCount = GetItemCount();
-	for (unsigned int i=0; i < maxCount; i++)
-	{
-		char option[13];
-		// I hate string concatenation in C/C++
-		snprintf(option, sizeof(option), "%s%d", prefix, i+1);
-		changeEvent->SetInt(option, votes[i]);
-	}
-	changeEvent->SetInt("potentialVotes", totalClients);
-	events->FireEvent(changeEvent);
-
-	return true;
+	return false;
 }
 
 void CTF2BuiltinVote::OnClientCommand(edict_t *pEntity, const CCommand &cmd)
@@ -443,7 +405,6 @@ void CTF2BuiltinVote::OnClientCommand(edict_t *pEntity, const CCommand &cmd)
 
 			int item = arg - 1;
 
-#if 0
 			// Swap Yes and No votes to match expectations
 			if (m_voteType != BuiltinVoteType_Custom_Mult && m_voteType != BuiltinVoteType_NextLevelMult)
 			{
@@ -456,7 +417,7 @@ void CTF2BuiltinVote::OnClientCommand(edict_t *pEntity, const CCommand &cmd)
 					item = BUILTINVOTES_VOTE_NO;
 				}
 			}
-#endif
+
 			s_VoteHandler.OnVoteSelect(this, client, item);
 
 			RETURN_META(MRES_SUPERCEDE);

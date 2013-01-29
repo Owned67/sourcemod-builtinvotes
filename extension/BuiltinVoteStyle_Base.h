@@ -152,8 +152,6 @@ public:
 	virtual bool Display(int clients[], unsigned int num_clients) =0;
 	bool Display(int client);
 	unsigned int GetBaseMemUsage();
-	virtual void SetTarget(int target);
-	virtual int GetTarget();
 protected:
 	unsigned int GetAllPlayers(cell_t clients[]);
 	bool DoClientVote(int clients[], unsigned int num_clients);
@@ -161,7 +159,6 @@ private:
 	void InternalDelete();
 protected:
 	String m_Argument;
-	short m_target;
 	IBuiltinVoteStyle *m_pStyle;
 	BaseStringTable m_Strings;
 	CVector<CItem> m_items;
