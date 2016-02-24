@@ -1,0 +1,1 @@
+BuiltinVotes is a SourceMod 1.4 Addon that lets plugins use the L4D/L4D2/TF2 built-in vote screens.
